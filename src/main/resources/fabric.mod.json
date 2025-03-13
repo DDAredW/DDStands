@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "ddstands",
+  "version": "${version}",
+  "name": "DDStands",
+  "description": "Created by @TgLunatik",
+  "authors": [
+    "Lunatik"
+  ],
+  "contact": {
+    "website": "https://github.com/DDAredW"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "lunadev.main.DDStands"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
