@@ -1,0 +1,70 @@
+package lunadev.main;
+
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.HashSet;
+import java.util.Set;
+
+public class DDStands implements ClientModInitializer {
+    private boolean messageShown = false;
+    private boolean enabled = true;
+    private KeyBinding toggleKey;
+    private final Set<Entity> hiddenArmorStands = new HashSet<>();
+
+    @Override
+    public void onInitializeClient() {
+        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.ddstands.toggle",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_G,
+                "category.ddstands"
+        ));
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> onTick(client));
+    }
+
+    private void onTick(MinecraftClient client) {
+        if (client.player != null && client.world != null) {
+            if (toggleKey.wasPressed()) {
+                enabled = !enabled;
+                client.player.sendMessage(Text.literal("DDStands " + (enabled ? "enabled" : "disabled")), false);
+                if (enabled) {
+                    hideArmorStands(client);
+                } else {
+                    showArmorStands(client);
+                }
+            }
+
+            if (!messageShown) {
+                client.player.sendMessage(Text.literal("Created By @TgLunatik - https://github.com/DDAredW"), false);
+                messageShown = true;
+            }
+        }
+    }
+
+    private void hideArmorStands(MinecraftClient client) {
+        hiddenArmorStands.clear();
+        for (Entity entity : client.world.getEntities()) {
+            if (entity instanceof ArmorStandEntity) {
+                entity.setInvisible(true);
+                hiddenArmorStands.add(entity);
+            }
+        }
+    }
+
+    private void showArmorStands(MinecraftClient client) {
+        for (Entity entity : hiddenArmorStands) {
+            entity.setInvisible(false);
+        }
+        hiddenArmorStands.clear();
+    }
+}
